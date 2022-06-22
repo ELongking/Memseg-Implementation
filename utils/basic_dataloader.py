@@ -47,13 +47,3 @@ def BaseDataloader(iD, gD, tD, train_mode=True, batch_size=16):
     loader = DataLoader(the_dataset, batch_size=batch_size, shuffle=True)
     return loader
 
-
-if __name__ == '__main__':
-    iD = r"G:/Dataset/mvtec_anomaly_detection/mvtec_anomaly_detection/carpet/test/color/"
-    gD = r'G:/Dataset/mvtec_anomaly_detection/mvtec_anomaly_detection/carpet/ground_truth/color/'
-    tD = r'G:/Dataset/DTD/dtd/images/banded/'
-
-    the_dataloader = BaseDataloader(iD, gD, tD, train_mode=True)
-
-    for idx, (image, gt) in enumerate(the_dataloader):
-        print(gt.shape)
