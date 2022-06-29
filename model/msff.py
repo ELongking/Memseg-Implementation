@@ -82,14 +82,18 @@ class MSFFBlock(nn.Module):
         x_k = self.conn(x_concat)
         return x_k
 
+    
+class ChannelPool(nn.Module):
+    def forward(self, x):
+        return torch.cat((torch.max(x, 1)[0].unsqueeze(1), torch.mean(x, 1).unsqueeze(1)), dim=1)
+
 
 class SpatialAttentionBlock(nn.Module):
-    def __init__(self, in_channel):
+    def __init__(self):
         super(SpatialAttentionBlock, self).__init__()
-        self.pool = nn.Sequential(nn.MaxPool2d(kernel_size=1, stride=1, padding=0),
-                                  nn.AvgPool2d(kernel_size=1, stride=1, padding=0))
-        self.conv = nn.Sequential(nn.Conv2d(in_channel, in_channel, kernel_size=7, stride=1, padding=3),
-                                  nn.BatchNorm2d(in_channel),
+        self.pool = ChannelPool()
+        self.conv = nn.Sequential(nn.Conv2d(2, 1, kernel_size=7, stride=1, padding=3),
+                                  nn.BatchNorm2d(1),
                                   nn.Sigmoid()
                                   )
 
@@ -108,9 +112,9 @@ class MSFF(nn.Module):
         self.blk2 = MSFFBlock(256)
         self.blk3 = MSFFBlock(128)
 
-        self.sa1 = SpatialAttentionBlock(256)
-        self.sa2 = SpatialAttentionBlock(128)
-        self.sa3 = SpatialAttentionBlock(64)
+        self.sa1 = SpatialAttentionBlock()
+        self.sa2 = SpatialAttentionBlock()
+        self.sa3 = SpatialAttentionBlock()
 
         self.upconv32 = nn.Sequential(nn.Upsample(scale_factor=0.5),
                                       nn.Conv2d(64, 128, kernel_size=3, stride=1, padding=1))
